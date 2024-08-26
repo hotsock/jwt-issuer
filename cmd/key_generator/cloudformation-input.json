@@ -1,0 +1,12 @@
+{
+  "RequestType": "Create",
+  "RequestId": "3fa6d24b-8ce7-4e2e-87b8-8414f28246d7",
+  "ResponseURL": "https://cloudformation-custom-resource-response-useast1.s3.amazonaws.com/arn%3Aaws%3Acloudformation%3Aus-east-1%3A111111111111%3Astack/JWTIssuer/d9385410-50ee-11ee-b05b-0a236ebfa8d3%7CKeyGeneratorCustomResource%7C3fa6d24b-8ce7-4e2e-87b8-8414f28246d7",
+  "ResourceType": "Custom::KeyGeneratorCustomResource",
+  "LogicalResourceId": "KeyGeneratorCustomResource",
+  "StackId": "arn:aws:cloudformation:us-east-1:111111111111:stack/JWTIssuer/d9385410-50ee-11ee-b05b-0a236ebfa8d3",
+  "ResourceProperties": {
+    "ServiceToken": "arn:aws:lambda:us-east-1:111111111111:function:JWTIssuer-KeyGeneratorFunction-nUthvnFU95BL",
+    "Version": "1"
+  }
+}
