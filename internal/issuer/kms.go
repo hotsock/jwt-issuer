@@ -56,7 +56,7 @@ func SignJWTWithKMS(ctx context.Context, kmsClient KMSAPI, token *jwt.Token, kms
 	fullSignature = append(fullSignature, esig.R.Bytes()...)
 	fullSignature = append(fullSignature, esig.S.Bytes()...)
 
-	sig := strings.TrimRight(base64.URLEncoding.EncodeToString(fullSignature), "=")
+	sig := base64.RawURLEncoding.EncodeToString(fullSignature)
 
 	return strings.Join([]string{sstr, sig}, "."), nil
 }
