@@ -20,7 +20,7 @@ type JWTIssuerFunctionInput struct {
 
 	// Optional number of seconds until the token will expire. Overrides "exp" in
 	// Claims, if provided.
-	TTL *time.Duration `json:"ttl,omitempty"`
+	TTL *int64 `json:"ttl,omitempty"`
 
 	// All the claims for the token.
 	Claims jwt.MapClaims `json:"claims,omitempty"`
@@ -42,7 +42,7 @@ func PrepareToken(input JWTIssuerFunctionInput, keyID string) *jwt.Token {
 	}
 
 	if input.TTL != nil {
-		input.Claims["exp"] = jwt.NewNumericDate(now.Add(time.Second * lo.FromPtr(input.TTL)))
+		input.Claims["exp"] = jwt.NewNumericDate(now.Add(time.Second * time.Duration(lo.FromPtr(input.TTL))))
 	}
 
 	if lo.FromPtr(input.SetJti) {

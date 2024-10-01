@@ -33,7 +33,7 @@ func Test_handler(t *testing.T) {
 	publicKeyObj, err := jwt.ParseECPublicKeyFromPEM(publicKeyPEM)
 	require.NoError(t, err)
 
-	output, err := handler(context.Background(), issuer.JWTIssuerFunctionInput{Claims: claims, TTL: lo.ToPtr(time.Duration(60)), SetIat: lo.ToPtr(true), SetJti: lo.ToPtr(true)})
+	output, err := handler(context.Background(), issuer.JWTIssuerFunctionInput{Claims: claims, TTL: lo.ToPtr(int64(60)), SetIat: lo.ToPtr(true), SetJti: lo.ToPtr(true)})
 	require.NoError(t, err)
 
 	generatedToken, err := jwt.Parse(output.Token, func(t *jwt.Token) (any, error) {
