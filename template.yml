@@ -176,4 +176,4 @@ Outputs:
       - !GetAtt KeyInfoLoaderKmsCustomResource.SigningMethod
       - !GetAtt KeyGeneratorParameterStoreCustomResource.SigningMethod
   Version:
-    Value: v1.0
+    Value: v1.1
