@@ -19,7 +19,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 	"github.com/hotsock/jwt-issuer/internal/issuer"
-	"github.com/samber/lo"
 )
 
 var SSM issuer.SSMAPI
@@ -74,12 +73,12 @@ func createParameters(ctx context.Context, privateKeyPEM []byte, publicKeyPEM []
 	permittedError := false
 
 	_, err := SSM.PutParameter(ctx, &ssm.PutParameterInput{
-		DataType:    lo.ToPtr("text"),
-		Description: lo.ToPtr("JWT Issuer Private Key"),
-		Name:        lo.ToPtr(issuer.PrivateKeyParameterName()),
-		Overwrite:   lo.ToPtr(false),
+		DataType:    new("text"),
+		Description: new("JWT Issuer Private Key"),
+		Name:        new(issuer.PrivateKeyParameterName()),
+		Overwrite:   new(false),
 		Type:        ssmtypes.ParameterTypeSecureString,
-		Value:       lo.ToPtr(string(privateKeyPEM)),
+		Value:       new(string(privateKeyPEM)),
 	})
 
 	if err != nil {
@@ -94,12 +93,12 @@ func createParameters(ctx context.Context, privateKeyPEM []byte, publicKeyPEM []
 	}
 
 	_, err = SSM.PutParameter(ctx, &ssm.PutParameterInput{
-		DataType:    lo.ToPtr("text"),
-		Description: lo.ToPtr("JWT Issuer Public Key"),
-		Name:        lo.ToPtr(issuer.PublicKeyParameterName()),
-		Overwrite:   lo.ToPtr(false),
+		DataType:    new("text"),
+		Description: new("JWT Issuer Public Key"),
+		Name:        new(issuer.PublicKeyParameterName()),
+		Overwrite:   new(false),
 		Type:        ssmtypes.ParameterTypeSecureString,
-		Value:       lo.ToPtr(string(publicKeyPEM)),
+		Value:       new(string(publicKeyPEM)),
 	})
 
 	if err != nil {

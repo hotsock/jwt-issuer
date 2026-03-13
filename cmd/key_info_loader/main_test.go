@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-lambda-go/cfn"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/hotsock/jwt-issuer/internal/mocks"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -28,7 +27,7 @@ func Test_handler(t *testing.T) {
 	mockKMS := mocks.KMSAPI{}
 	kmsPublicKey, _ := base64.StdEncoding.DecodeString(kmsPublicKeyResponse)
 	kmsOutput := &kms.GetPublicKeyOutput{
-		KeyId:     lo.ToPtr(event.ResourceProperties["KeyArn"].(string)),
+		KeyId:     new(event.ResourceProperties["KeyArn"].(string)),
 		PublicKey: []byte(kmsPublicKey),
 	}
 	mockKMS.On("GetPublicKey", mock.Anything, mock.Anything).Return(kmsOutput, nil)

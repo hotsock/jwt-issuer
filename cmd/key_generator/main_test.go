@@ -64,7 +64,7 @@ func Test_handler(t *testing.T) {
 
 	t.Run("create requests no-op parameter store write if parameters already exist", func(t *testing.T) {
 		mockSSM := mocks.SSMAPI{}
-		mockSSM.On("PutParameter", mock.Anything, mock.Anything).Return(nil, &ssmtypes.ParameterAlreadyExists{Message: lo.ToPtr("parameter already exists")})
+		mockSSM.On("PutParameter", mock.Anything, mock.Anything).Return(nil, &ssmtypes.ParameterAlreadyExists{Message: new("parameter already exists")})
 		SSM = &mockSSM
 
 		event.RequestType = cfn.RequestCreate

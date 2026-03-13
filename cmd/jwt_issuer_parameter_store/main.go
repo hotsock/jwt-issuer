@@ -23,8 +23,8 @@ func main() {
 	SSM = ssm.NewFromConfig(baseConfig)
 
 	getParamResponse, err := SSM.GetParameter(context.TODO(), &ssm.GetParameterInput{
-		Name:           lo.ToPtr(issuer.PrivateKeyParameterName()),
-		WithDecryption: lo.ToPtr(true),
+		Name:           new(issuer.PrivateKeyParameterName()),
+		WithDecryption: new(true),
 	})
 	if err != nil {
 		panic(err)

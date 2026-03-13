@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/samber/lo"
 )
 
 type KMSAPI interface {
@@ -29,7 +28,7 @@ func SignJWTWithKMS(ctx context.Context, kmsClient KMSAPI, token *jwt.Token, kms
 	}
 
 	signInput := &kms.SignInput{
-		KeyId:            lo.ToPtr(kmsKeyArn),
+		KeyId:            new(kmsKeyArn),
 		Message:          []byte(sstr),
 		MessageType:      kmstypes.MessageTypeRaw,
 		SigningAlgorithm: kmstypes.SigningAlgorithmSpecEcdsaSha256,

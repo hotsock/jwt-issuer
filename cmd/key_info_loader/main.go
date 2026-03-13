@@ -32,7 +32,7 @@ func handler(ctx context.Context, event cfn.Event) (physicalResourceID string, d
 	physicalResourceID = "KeyInfoLoader"
 
 	publicKeyOutput, err := KMS.GetPublicKey(ctx, &kms.GetPublicKeyInput{
-		KeyId: lo.ToPtr(os.Getenv("SIGNING_KEY_ARN")),
+		KeyId: new(os.Getenv("SIGNING_KEY_ARN")),
 	})
 
 	if err != nil {

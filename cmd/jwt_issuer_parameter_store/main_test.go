@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hotsock/jwt-issuer/internal/issuer"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,7 +32,7 @@ func Test_handler(t *testing.T) {
 	publicKeyObj, err := jwt.ParseECPublicKeyFromPEM(publicKeyPEM)
 	require.NoError(t, err)
 
-	output, err := handler(context.Background(), issuer.JWTIssuerFunctionInput{Claims: claims, TTL: lo.ToPtr(int64(60)), SetIat: lo.ToPtr(true), SetJti: lo.ToPtr(true)})
+	output, err := handler(context.Background(), issuer.JWTIssuerFunctionInput{Claims: claims, TTL: new(int64(60)), SetIat: new(true), SetJti: new(true)})
 	require.NoError(t, err)
 
 	generatedToken, err := jwt.Parse(output.Token, func(t *jwt.Token) (any, error) {
