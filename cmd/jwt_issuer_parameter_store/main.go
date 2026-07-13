@@ -6,11 +6,12 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hotsock/jwt-issuer/internal/issuer"
+	"github.com/hotsock/voker"
+	"github.com/hotsock/voker/vokerslog"
 	"github.com/samber/lo"
 )
 
@@ -19,6 +20,9 @@ var privateKey *ecdsa.PrivateKey
 var keyID string
 
 func main() {
+	logger := slog.New(vokerslog.NewHandler(os.Stdout))
+	slog.SetDefault(logger)
+
 	baseConfig, _ := config.LoadDefaultConfig(context.TODO(), config.WithRegion(os.Getenv("AWS_REGION")))
 	SSM = ssm.NewFromConfig(baseConfig)
 
@@ -38,7 +42,7 @@ func main() {
 	privateKey = key
 	keyID = issuer.ParameterStoreKeyID()
 
-	lambda.StartHandlerFunc(issuer.HandlerWithLambdaLogging(handler))
+	voker.Start(handler, voker.WithLogger(logger))
 }
 
 func handler(ctx context.Context, input issuer.JWTIssuerFunctionInput) (issuer.JWTIssuerFunctionOutput, error) {

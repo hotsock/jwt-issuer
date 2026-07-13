@@ -7,11 +7,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aws/aws-lambda-go/cfn"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 	"github.com/hotsock/jwt-issuer/internal/issuer"
 	"github.com/hotsock/jwt-issuer/internal/mocks"
+	"github.com/hotsock/voker/vokercfn"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -23,14 +23,14 @@ var cloudformationInput []byte
 func Test_handler(t *testing.T) {
 	os.Setenv(issuer.StackArnEnvVar, "arn:aws:cloudformation:us-east-1:111111111111:stack/JWTIssuer/d9385410-50ee-11ee-b05b-0a236ebfa8d3")
 
-	var event cfn.Event
+	var event vokercfn.Event[keyGeneratorProperties]
 	json.Unmarshal(cloudformationInput, &event)
 
 	t.Run("update requests no-op", func(t *testing.T) {
 		mockSSM := mockedSSM()
 		SSM = mockSSM
 
-		event.RequestType = cfn.RequestUpdate
+		event.RequestType = vokercfn.RequestUpdate
 		handler(context.Background(), event)
 		mockSSM.AssertNotCalled(t, "PutParameter", mock.Anything, mock.Anything)
 	})
@@ -39,7 +39,7 @@ func Test_handler(t *testing.T) {
 		mockSSM := mockedSSM()
 		SSM = mockSSM
 
-		event.RequestType = cfn.RequestDelete
+		event.RequestType = vokercfn.RequestDelete
 		handler(context.Background(), event)
 		mockSSM.AssertCalled(t, "DeleteParameters", mock.Anything, mock.Anything)
 	})
@@ -48,7 +48,7 @@ func Test_handler(t *testing.T) {
 		mockSSM := mockedSSM()
 		SSM = mockSSM
 
-		event.RequestType = cfn.RequestCreate
+		event.RequestType = vokercfn.RequestCreate
 		handler(context.Background(), event)
 		mockSSM.AssertNumberOfCalls(t, "PutParameter", 2)
 
@@ -67,7 +67,7 @@ func Test_handler(t *testing.T) {
 		mockSSM.On("PutParameter", mock.Anything, mock.Anything).Return(nil, &ssmtypes.ParameterAlreadyExists{Message: new("parameter already exists")})
 		SSM = &mockSSM
 
-		event.RequestType = cfn.RequestCreate
+		event.RequestType = vokercfn.RequestCreate
 		handler(context.Background(), event)
 		mockSSM.AssertNumberOfCalls(t, "PutParameter", 2)
 	})

@@ -1,0 +1,9 @@
+filename: "{{.InterfaceName}}.go"
+structname: "{{.InterfaceName}}"
+dir: internal/mocks
+pkgname: mocks
+packages:
+  github.com/hotsock/jwt-issuer/internal/issuer:
+    interfaces:
+      KMSAPI:
+      SSMAPI:

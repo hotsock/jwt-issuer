@@ -13,43 +13,60 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/aws/aws-lambda-go/cfn"
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 	"github.com/hotsock/jwt-issuer/internal/issuer"
+	"github.com/hotsock/voker"
+	"github.com/hotsock/voker/vokercfn"
+	"github.com/hotsock/voker/vokerslog"
 )
 
 var SSM issuer.SSMAPI
 
+// keyGeneratorProperties is the CloudFormation custom resource's
+// ResourceProperties. The key generator does not take any input properties.
+type keyGeneratorProperties struct{}
+
+// keyGeneratorData is the CloudFormation custom resource's Data, exposed to
+// the stack through Fn::GetAtt.
+type keyGeneratorData struct {
+	KeyArn             string `json:"KeyArn"`
+	KeyID              string `json:"KeyID"`
+	PublicKeyPEMBase64 string `json:"PublicKeyPEMBase64"`
+	SigningMethod      string `json:"SigningMethod"`
+}
+
 func main() {
+	logger := slog.New(vokerslog.NewHandler(os.Stdout))
+	slog.SetDefault(logger)
+
 	baseConfig, _ := config.LoadDefaultConfig(context.TODO(), config.WithRegion(os.Getenv("AWS_REGION")))
 	SSM = ssm.NewFromConfig(baseConfig)
 
-	lambda.Start(cfn.LambdaWrap(issuer.CloudFormationHandlerWithLambdaLogging(handler)))
+	vokercfn.Start(handler, voker.WithLogger(logger))
 }
 
-func handler(ctx context.Context, event cfn.Event) (physicalResourceID string, data map[string]any, err error) {
+func handler(ctx context.Context, event vokercfn.Event[keyGeneratorProperties]) (result vokercfn.Result[keyGeneratorData], err error) {
 	defer issuer.LogWithTiming(ctx, slog.LevelInfo, "key_generator.handler", "event", event)()
 
-	physicalResourceID = "KeyGenerator"
+	result.PhysicalResourceID = "KeyGenerator"
 
 	switch event.RequestType {
-	case cfn.RequestCreate:
+	case vokercfn.RequestCreate:
 		privateKeyPEM, publicKeyPEM := generateKeyPair()
 		err = createParameters(ctx, privateKeyPEM, publicKeyPEM)
-		data = map[string]any{
-			"KeyArn":             "",
-			"KeyID":              issuer.ParameterStoreKeyID(),
-			"PublicKeyPEMBase64": base64.StdEncoding.EncodeToString(publicKeyPEM),
-			"SigningMethod":      "ES256",
+		result.Data = keyGeneratorData{
+			KeyArn:             "",
+			KeyID:              issuer.ParameterStoreKeyID(),
+			PublicKeyPEMBase64: base64.StdEncoding.EncodeToString(publicKeyPEM),
+			SigningMethod:      "ES256",
 		}
 		return
-	case cfn.RequestUpdate:
+	case vokercfn.RequestUpdate:
 		// no-op
 		return
-	case cfn.RequestDelete:
+	case vokercfn.RequestDelete:
 		deleteParameters(ctx)
 		return
 	}

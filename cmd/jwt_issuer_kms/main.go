@@ -6,10 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/hotsock/jwt-issuer/internal/issuer"
+	"github.com/hotsock/voker"
+	"github.com/hotsock/voker/vokerslog"
 )
 
 var KMS issuer.KMSAPI
@@ -17,6 +18,9 @@ var signingKeyArn string
 var keyID string
 
 func main() {
+	logger := slog.New(vokerslog.NewHandler(os.Stdout))
+	slog.SetDefault(logger)
+
 	baseConfig, _ := config.LoadDefaultConfig(context.TODO(), config.WithRegion(os.Getenv("AWS_REGION")))
 	KMS = kms.NewFromConfig(baseConfig)
 
@@ -27,7 +31,7 @@ func main() {
 		keyID = arnParts[1]
 	}
 
-	lambda.StartHandlerFunc(issuer.HandlerWithLambdaLogging(handler))
+	voker.Start(handler, voker.WithLogger(logger))
 }
 
 func handler(ctx context.Context, input issuer.JWTIssuerFunctionInput) (issuer.JWTIssuerFunctionOutput, error) {
